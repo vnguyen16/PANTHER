@@ -16,7 +16,7 @@ By performing an extensive evaluation of **PANTHER** on subtyping and survival t
 <img src='docs/fig_main.jpg' width="1400px" align="center"/>
 
 ## Updates
-- **02/17/2025**: You can also use [TRIDENT](https://github.com/mahmoodlab/Trident) to extract patch features for PANTHER. We also added small
+- **02/17/2025**: You can also use [TRIDENT](https://github.com/mahmoodlab/Trident) to extract patch features for PANTHER.
 - **07/02/2024**: Multimodal extension of PANTHER ([MMP](https://github.com/mahmoodlab/MMP)) codebase is now live.
 - **05/06/2024**: The first version of PANTHER codebase is now live.
 
