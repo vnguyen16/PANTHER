@@ -231,19 +231,40 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 if __name__ == "__main__":
 
+    # modify split name (new) -------------------------
     args.label_map = label_dicts[args.task]
     print('label map: ', args.label_map)
     args.n_classes = len(set(list(args.label_map.values())))
     print('task: ', args.task)
+
+    # Prepend "splits/" to the split_dir
     args.split_dir = j_('splits', args.split_dir)
     print('split_dir: ', args.split_dir)
+
+    # Safely extract split name and fold number
+    split_folder = os.path.basename(args.split_dir)
+    split_name_parts = split_folder.split('_k=')
+    args.split_name_clean = split_name_parts[0]
+    args.split_k = int(split_name_parts[1]) if len(split_name_parts) > 1 else 0
     
-    split_num = args.split_dir.split('/')[2].split('_k=')
-    args.split_name_clean = args.split_dir.split('/')[2].split('_k=')[0]
-    if len(split_num) > 1:
-        args.split_k = int(split_num[1])
-    else:
-        args.split_k = 0
+    # ------------------------
+    # # modify split name (old) -------------------------
+    # args.label_map = label_dicts[args.task]
+    # print('label map: ', args.label_map)
+    # args.n_classes = len(set(list(args.label_map.values())))
+    # print('task: ', args.task)
+    # args.split_dir = j_('splits', args.split_dir)
+    # print('split_dir: ', args.split_dir)
+    
+    # split_num = args.split_dir.split('/')[2].split('_k=') # og
+
+    # args.split_name_clean = args.split_dir.split('/')[2].split('_k=')[0]
+    # if len(split_num) > 1:
+    #     args.split_k = int(split_num[1])
+    # else:
+    #     args.split_k = 0
+
+    # ---------------------------------------------------
 
     print(args.proto_path)
     if os.path.isfile(args.proto_path):
@@ -290,13 +311,17 @@ if __name__ == "__main__":
         else:
             exp_code = f"{args.split_name_clean}::{args.model_config}::{feat_name}"
     else:
-        pass
+        # pass
+        exp_code = args.exp_code # modified to use exp_code directly
     
     args.results_dir = j_(args.results_dir, 
                           args.task, 
                           f'k={args.split_k}', 
                           str(exp_code), 
-                          str(exp_code)+f"::{get_current_time()}")
+                        #   str(exp_code)+f"::{get_current_time()}")
+                        str(exp_code) + f"--{get_current_time()}" # modified to use -- instead of + for time
+                          )
+
 
     os.makedirs(args.results_dir, exist_ok=True)
 

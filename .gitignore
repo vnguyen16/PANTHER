@@ -11,3 +11,4 @@ src/results/
 **/embeddings/
 **/prototypes/
 **/test.ipynb
+*.csv
