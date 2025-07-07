@@ -78,11 +78,39 @@ def get_default_cmap(n=32):
     label2color_dict = dict(zip(range(n), [hex_to_rgb_mpl_255(x) for x in colors]))
     return label2color_dict
 
-def get_panther_encoder(in_dim, p, proto_path, config_dir='../'):
+# og function
+# def get_panther_encoder(in_dim, p, proto_path, config_dir='../'):
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument('--model_type', type=str, default='PANTHER')
+#     parser.add_argument('--proto_model_type', type=str, default='PANTHER')
+#     parser.add_argument('--model_config', type=str, default='PANTHER_default')
+#     parser.add_argument('--in_dim', type=int, default=in_dim)
+#     parser.add_argument('--embed_dim', type=int, default=64)
+#     parser.add_argument('--n_proto', type=int, default=16)
+#     parser.add_argument('--n_classes', type=str, default=2)
+#     parser.add_argument('--out_size', type=int, default=p)
+#     parser.add_argument('--em_iter', type=int, default=1)
+#     parser.add_argument('--tau', type=float, default=1)
+#     parser.add_argument('--out_type', type=str, default='param_cat')
+#     parser.add_argument('--n_fc_layers', type=int, default=0)
+#     parser.add_argument('--load_proto', type=int, default=1)
+#     parser.add_argument('--ot_eps', type=int, default=1)
+#     args = parser.parse_known_args()[0]
+#     args.fix_proto = 1
+#     args.proto_path = proto_path
+
+#     model = create_embedding_model(args, config_dir=config_dir)
+#     model.eval()
+#     return model
+
+# modified function to accept model config as argument -----------------
+def get_panther_encoder(in_dim, p, proto_path, config_dir='../', model_config='PANTHER_default', out_type='param_cat'):
+    import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_type', type=str, default='PANTHER')
     parser.add_argument('--proto_model_type', type=str, default='PANTHER')
-    parser.add_argument('--model_config', type=str, default='PANTHER_default')
+    parser.add_argument('--model_config', type=str, default=model_config)  # updated line
     parser.add_argument('--in_dim', type=int, default=in_dim)
     parser.add_argument('--embed_dim', type=int, default=64)
     parser.add_argument('--n_proto', type=int, default=16)
@@ -90,10 +118,11 @@ def get_panther_encoder(in_dim, p, proto_path, config_dir='../'):
     parser.add_argument('--out_size', type=int, default=p)
     parser.add_argument('--em_iter', type=int, default=1)
     parser.add_argument('--tau', type=float, default=1)
-    parser.add_argument('--out_type', type=str, default='param_cat')
+    parser.add_argument('--out_type', type=str, default=out_type)
     parser.add_argument('--n_fc_layers', type=int, default=0)
     parser.add_argument('--load_proto', type=int, default=1)
     parser.add_argument('--ot_eps', type=int, default=1)
+
     args = parser.parse_known_args()[0]
     args.fix_proto = 1
     args.proto_path = proto_path
@@ -101,6 +130,7 @@ def get_panther_encoder(in_dim, p, proto_path, config_dir='../'):
     model = create_embedding_model(args, config_dir=config_dir)
     model.eval()
     return model
+# ---------------------------------------------------------------------
 
 def visualize_categorical_heatmap(
         wsi,
