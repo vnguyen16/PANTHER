@@ -245,12 +245,12 @@ def compose_all_slides(
         )
 
 compose_all_slides(
-    slides_root=r"C:\Users\Vivian\Documents\PANTHER\PANTHER\features\test_slide\test_visualizations",
-    output_dir=r"C:\Users\Vivian\Documents\PANTHER\PANTHER\features\test_slide\composites",
+    slides_root=r"C:\Users\Vivian\Documents\PANTHER\PANTHER\features\test_slide\2.5x_test_visualizations",
+    output_dir=r"C:\Users\Vivian\Documents\PANTHER\PANTHER\features\test_slide\2.5x_composites",
     map_file="prototype_map.png",
     mixture_file="mixture_plot.png",
     protos_file="patches.png",          # or "8_patches.png"
-    title_template="{slide_id} (5x)",
+    title_template="{slide_id} (2.5x)",
     target_top_height=1200,
     skip_existing=True
 )
