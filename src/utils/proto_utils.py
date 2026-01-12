@@ -65,6 +65,10 @@ def cluster(data_loader, n_proto, n_iter, n_init=5, feature_dim=1024, n_proto_pa
         kmeans.fit(patches[:n_patches].cpu())
         weight = kmeans.cluster_centers_[np.newaxis, ...]
 
+        # # Add normalization before saving (norm2 experiments) 🔽 ---------------
+        weight = weight / np.linalg.norm(weight, axis=-1, keepdims=True) # adding this line to normalize the prototypes
+        # ----------------------------------------------
+
     elif mode == 'faiss':
         assert use_cuda, f"FAISS requires access to GPU. Please enable use_cuda"
         try:

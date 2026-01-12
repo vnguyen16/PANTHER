@@ -25,14 +25,24 @@ from mil_models import create_embedding_model
 
 def get_mixture_plot(mixtures):
     colors = [
-        '#696969','#556b2f','#a0522d','#483d8b', 
-        '#008000','#008b8b','#000080','#7f007f',
-        '#8fbc8f','#b03060','#ff0000','#ffa500',
-        '#00ff00','#8a2be2','#00ff7f', '#FFFF54', 
-        '#00ffff','#00bfff','#f4a460','#adff2f',
-        '#da70d6','#b0c4de','#ff00ff','#1e90ff',
-        '#f0e68c','#0000ff','#dc143c','#90ee90',
-        '#ff1493','#7b68ee','#ffefd5','#ffb6c1']
+    '#696969','#556b2f','#a0522d','#483d8b', 
+    "#8975AD",'#008b8b','#000080','#7f007f',
+    '#8fbc8f','#b03060','#ff0000','#ffa500',
+    '#00ff00','#8a2be2',"#de84c6", '#FFFF54', 
+    '#00ffff','#00bfff','#f4a460','#adff2f',
+    '#da70d6','#b0c4de','#ff00ff','#1e90ff',
+    '#f0e68c','#0000ff','#dc143c','#90ee90',
+    '#ff1493','#7b68ee','#ffefd5','#ffb6c1'
+]
+    # colors = [
+    #     '#696969','#556b2f','#a0522d','#483d8b', 
+    #     '#008000','#008b8b','#000080','#7f007f',
+    #     '#8fbc8f','#b03060','#ff0000','#ffa500',
+    #     '#00ff00','#8a2be2','#00ff7f', '#FFFF54', 
+    #     '#00ffff','#00bfff','#f4a460','#adff2f',
+    #     '#da70d6','#b0c4de','#ff00ff','#1e90ff',
+    #     '#f0e68c','#0000ff','#dc143c','#90ee90',
+    #     '#ff1493','#7b68ee','#ffefd5','#ffb6c1']
 
     cmap = {f'c{k}':v for k,v in enumerate(colors[:len(mixtures)])}
     mpl.rcParams['axes.spines.left'] = True
@@ -65,9 +75,9 @@ def hex_to_rgb_mpl_255(hex_color):
 def get_default_cmap(n=32):
     colors = [
         '#696969','#556b2f','#a0522d','#483d8b', 
-        '#008000','#008b8b','#000080','#7f007f',
+        "#8975AD",'#008b8b','#000080','#7f007f',
         '#8fbc8f','#b03060','#ff0000','#ffa500',
-        '#00ff00','#8a2be2','#00ff7f', '#FFFF54', 
+        '#00ff00','#8a2be2',"#de84c6", '#FFFF54', 
         '#00ffff','#00bfff','#f4a460','#adff2f',
         '#da70d6','#b0c4de','#ff00ff','#1e90ff',
         '#f0e68c','#0000ff','#dc143c','#90ee90',

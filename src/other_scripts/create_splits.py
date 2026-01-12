@@ -62,6 +62,9 @@ def convert_labels_to_strings(split_dir, label_map={0: 'FA', 1: 'PT'}, overwrite
             df.to_csv(new_path, index=False)
             print(f"✅ Saved converted labels to {new_path}")
 
+# create splits for spider dataset
+
+
 
 if __name__ == "__main__":
     # create_panther_splits(

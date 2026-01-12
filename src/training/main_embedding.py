@@ -38,7 +38,7 @@ def build_datasets(csv_splits, batch_size=1, num_workers=2, train_kwargs={}):
 
 def main(args):
     
-    train_kwargs = dict(data_source=args.data_source)
+    train_kwargs = dict(data_source=args.data_source, sample_col=args.sample_col) # added sample_col arg
        
     seed_torch(args.seed)
     csv_splits = read_splits(args)
@@ -101,6 +101,8 @@ parser.add_argument('--num_workers', type=int, default=8)
 parser.add_argument('--load_proto', action='store_true', default=False)
 parser.add_argument('--proto_path', type=str)
 parser.add_argument('--fix_proto', action='store_true', default=False)
+
+parser.add_argument('--sample_col', type=str, default='slide_id', help='column used to group rows into bags') # added this 
 
 args = parser.parse_args()
 

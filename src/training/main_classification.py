@@ -17,7 +17,7 @@ from utils.utils import (seed_torch, array2list, merge_dict, read_splits,
                          extract_patching_info)
 
 from .trainer import train
-from wsi_datasets import WSIClassificationDataset
+from wsi_datasets import WSIClassificationDataset, PatchClassificationDataset
 from data_factory import tasks, label_dicts
 
 import torch
@@ -63,7 +63,8 @@ def build_datasets(csv_splits, model_type, batch_size=1, num_workers=2,
         dataset_kwargs = train_kwargs.copy() if (k == 'train') else val_kwargs.copy()
         if k == 'test_nlst':
             dataset_kwargs['sample_col'] = 'case_id'
-        dataset = WSIClassificationDataset(df, **dataset_kwargs)
+        dataset = WSIClassificationDataset(df, **dataset_kwargs) # OG
+        # dataset = PatchClassificationDataset(df, **dataset_kwargs) # modifying for patch classification
         data_sampler = build_sampler(dataset, sampler_type=sampler_types.get(k, 'sequential'))
 
         # If prototype methods, each WSI will have same feature bag dimension and is batchable
@@ -91,13 +92,15 @@ def main(args):
                           label_map=args.label_map,
                           target_col=args.target_col,
                           bag_size=args.train_bag_size,
-                          shuffle=True)
+                          shuffle=True,
+                          sample_col=args.sample_col) # adding sample col arg
     
     # use the whole bag at test time
     val_kwargs = dict(data_source=args.data_source,
                           label_map=args.label_map,
                           target_col=args.target_col,
-                          bag_size=args.val_bag_size)
+                          bag_size=args.val_bag_size,
+                          sample_col=args.sample_col) # adding sample col arg
 
     all_results, all_dumps = {}, {}
 
@@ -221,6 +224,9 @@ parser.add_argument('--split_names', type=str, default='train,val,test',
 parser.add_argument('--overwrite', action='store_true', default=False,
                     help='overwrite existing results')
 
+parser.add_argument('--sample_col', type=str, default='slide_id',
+                    help='column name for sample IDs (caseID or slideID) in the split csv files') # added this arg
+
 # logging args ###
 parser.add_argument('--results_dir', default='./results',
                     help='results directory (default: ./results)')
@@ -319,7 +325,7 @@ if __name__ == "__main__":
                           f'k={args.split_k}', 
                           str(exp_code), 
                         #   str(exp_code)+f"::{get_current_time()}")
-                        str(exp_code) + f"--{get_current_time()}" # modified to use -- instead of + for time
+                        str(exp_code) + f"--{get_current_time()}" # modified to use -- instead of :: for time
                           )
 
 

@@ -14,3 +14,10 @@ src/results/
 *.csv
 *.h5
 *.png
+*.npz
+*.npy
+*.__pycache__
+*.json
+*.pyc
+*.pkl
+*.log

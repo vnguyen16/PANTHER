@@ -8,6 +8,10 @@ import torch
 import torch.nn as nn
 from torch.utils.tensorboard import SummaryWriter
 
+# from src.mil_models.OT.ckn import data # og
+# from ..mil_models.OT.ckn import data # changed to relative import
+
+
 try:
     from sksurv.metrics import concordance_index_censored
 except ImportError:
@@ -75,11 +79,24 @@ def train(datasets, args, mode='classification'):
             if 'LinearEmb' in args.emb_model_type:
                 # Theis emb_model_type doesn't require per-prototype structure (simple linear layer)
                 factor = 1
+
+                # ---------------------------------------------------------
+                # DEBUG: run tokenizer just to see π --> only works with allcat
+                # tokenizer = PrototypeTokenizer(args.model_type, args.out_type, args.n_proto)
+                # prob, mean, cov = tokenizer(loader.dataset.X)
+
+                # print(f"[DEBUG] First 5 patches mixture probabilities (π):\n{prob[:5]}")
+                # ---------------------------------------------------------
+
             else:
                 # The original embedding is 1-D (long) feature vector
                 # Reshape it to (n_proto, -1)
                 tokenizer = PrototypeTokenizer(args.model_type, args.out_type, args.n_proto)
                 prob, mean, cov = tokenizer(loader.dataset.X)
+
+                # DEBUG: print the first 5 patches' mixture probabilities for this slide ------
+                print(f"[DEBUG] First 5 patches mixture probabilities (π):\n{prob[:5]}")
+                # ----------------------------------------------------------------------
                 loader.dataset.X = torch.cat([torch.Tensor(prob).unsqueeze(dim=-1), torch.Tensor(mean), torch.Tensor(cov)], dim=-1)
 
                 factor = args.n_proto
@@ -204,6 +221,31 @@ def train_loop_classification(model, loader, optimizer, lr_scheduler, loss_fn=No
         if in_dropout:
             data = F.dropout(data, p=in_dropout)
         attn_mask = batch['attn_mask'].to(device) if ('attn_mask' in batch) else None
+
+        # --------------------------- added for patch-level classification 🔴
+        # # 🔴Patch-level mode: request patch logits
+        # out, log_dict = model(data, return_patch_logits=True) # hardcoded to True for patch-level classification
+        # patch_logits = out['patch_logits']            # [B*N, C]
+        # # B, N, _ = data.shape
+        # B = data.size(0)  # number of patches
+        # D = data.size(1)  # feature dim
+        # patch_labels = label    # [B*N]
+
+        # # 🔴Loss on patch-level predictions
+        # loss = loss_fn(patch_logits, patch_labels)
+        # loss = loss / accum_steps
+        # loss.backward()
+        # if (batch_idx + 1) % accum_steps == 0:
+        #     optimizer.step()
+        #     lr_scheduler.step()
+        #     optimizer.zero_grad()
+
+        # # 🔴Accuracy on patch-level
+        # acc = (patch_labels == patch_logits.argmax(dim=-1)).float().mean()
+        # -------------------------------------------------------------🔴
+
+
+        # --------------------------- OG code
         model_kwargs = {'attn_mask': attn_mask, 'label': label, 'loss_fn': loss_fn}
         out, log_dict = model(data, model_kwargs)
 
@@ -224,6 +266,7 @@ def train_loop_classification(model, loader, optimizer, lr_scheduler, loss_fn=No
             if key not in meters:
                 meters[key] = AverageMeter()
             meters[key].update(val, n=len(data))
+        # ------------------------------------ OG code 
 
         acc_meter.update(acc.item(), n=len(data))
         bag_size_meter.update(data.size(1), n=len(data))
@@ -258,6 +301,38 @@ def validate_classification(model, loader,
             label = label.squeeze(dim=-1)
 
         attn_mask = batch['attn_mask'].to(device) if ('attn_mask' in batch) else None
+
+        # --------------------------- added for patch-level classification 🔴
+    #     # 🔴 Patch-level mode: request patch logits
+    #     out, log_dict = model(data, return_patch_logits=True)  
+    #     patch_logits = out['patch_logits']            # [B*N, C]
+    #     # B, N, _ = data.shape
+    #     B = data.size(0)  # number of patches
+    #     D = data.size(1)  # feature dim
+    #     patch_labels = label    # [B*N]
+
+    #     # 🔴 Accuracy on patch-level
+    #     acc = (patch_labels == patch_logits.argmax(dim=-1)).float().mean()
+    #     acc_meter.update(acc.item(), n=len(patch_labels))
+    #     bag_size_meter.update(data.size(1), n=len(data))
+
+    #     # 🔴 Store patch-level probabilities
+    #     all_probs.append(torch.softmax(patch_logits, dim=-1).cpu().numpy())
+    #     all_labels.append(patch_labels.cpu().numpy())
+
+    #     if verbose and (((batch_idx + 1) % print_every == 0) or (batch_idx == len(loader) - 1)):
+    #         msg = [f"avg_{k}: {meter.avg:.4f}" for k, meter in meters.items()]
+    #         msg = f"batch {batch_idx}\t" + "\t".join(msg)
+    #         print(msg)
+
+    # # 🔴 Concatenate patch-level results
+    # all_probs = np.concatenate(all_probs)
+    # all_labels = np.concatenate(all_labels)
+    # all_preds = all_probs.argmax(axis=1)
+    # n_classes = all_probs.shape[1]
+    # ------------------------------------------------------------------------🔴
+
+    # -------------------------------------- OG code
         model_kwargs = {'attn_mask': attn_mask, 'label': label, 'loss_fn': loss_fn}
         out, log_dict = model(data, model_kwargs)
         
@@ -284,6 +359,7 @@ def validate_classification(model, loader,
     all_probs = np.concatenate(all_probs)
     all_labels = np.concatenate(all_labels)
     all_preds = all_probs.argmax(axis=1)
+    # --------------------------------------- OG code
 
     results = sweep_classification_metrics(all_probs, all_labels, all_preds=all_preds, n_classes=n_classes)
     results.update({k: meter.avg for k, meter in meters.items()})

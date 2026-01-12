@@ -1,0 +1,2 @@
+*SPIDER dataset*
+python -m training.main_prototype --mode kmeans --data_source C:\Users\Vivian\Documents\CLAM\CLAM\FEATURES_DIR_5x\spider_run2\feats_pt --split_dir spider\FA_PT_k=4 --split_names train --in_dim 1024 --n_proto_patches 1000000 --n_proto 16 --n_init 5 --seed 1 --num_workers 10

@@ -35,7 +35,7 @@ def build_datasets(csv_splits, batch_size=1, num_workers=2, train_kwargs={}):
 
 def main(args):
     
-    train_kwargs = dict(data_source=args.data_source)
+    train_kwargs = dict(data_source=args.data_source, sample_col=args.sample_col) # added sample_col arg
        
     seed_torch(args.seed)
     csv_splits = read_splits(args)
@@ -91,6 +91,9 @@ parser.add_argument('--split_dir', type=str, default=None,
 parser.add_argument('--split_names', type=str, default='train,val,test',
                     help='delimited list for specifying names within each split')
 parser.add_argument('--num_workers', type=int, default=8)
+
+parser.add_argument('--sample_col', type=str, default='slide_id',
+                    help='column name for sample IDs (caseID or slideID) in the split csv files') # added this arg
 
 args = parser.parse_args()
 
